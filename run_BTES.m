@@ -39,7 +39,6 @@ end
 
 
 for tt=1:num_band
-    tt
     I_band=squeeze(I_3D(:,:,tt));
     for iter=1:4
         S1=Snew{tt,iter};

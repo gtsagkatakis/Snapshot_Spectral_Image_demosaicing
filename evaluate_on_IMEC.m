@@ -1,8 +1,7 @@
-function evaluate_on_IMEC(num_band,sz,smp_scenario,num_obs_pxl,GRMR_params)
+function [RES]=evaluate_on_IMEC(num_band,sz,smp_scenario,num_obs_pxl,GRMR_params)
 
 
 [I_HS,I1_SMP_SEQ]=load_snapshot_w_band_new(sz,num_band);
-
 
 [I_MOS_seq]=simulate_video(I_HS,I1_SMP_SEQ,num_obs_pxl,num_band);
 
@@ -59,11 +58,6 @@ I_BTES=mean(I_BTES_tmp,4);
 I_ItSD=mean(I_ItSD_tmp,4);
 I_PPID=mean(I_PPID_tmp,4);
 
-% offset=10;
-% maxIter=20; %was 20
-% sgm2=1e2; 
-% gamma=0.1; 
-% rank_sel=2;
 
 offset=GRMR_params.offset;
 maxIter=GRMR_params.maxIter; 
@@ -76,23 +70,8 @@ disp('Running GRMR');
 I_GRMR_rec=run_GRMR_demosaick(I_MOS_seq,SMP_SEQ,num_band,offset,sgm2,maxIter,rank_sel,gamma,I_WB);
 
 
+RES={I_HS,I_GRMR_rec,I_BTES,I_WB,I_PPID,I_ItSD};
 
-h1=figure;
-h2=figure;
-h3=figure;
-h4=figure;
-h5=figure;
-
-for tt=1:num_band
-    figure(h1); imagesc(squeeze(I_GRMR_rec(:,:,tt)),[0,256]); colormap('gray'); title('GRMR');
-    figure(h2); imagesc(squeeze(I_BTES(:,:,tt)),[0,256]); colormap('gray');title('BTES');
-    figure(h3); imagesc(squeeze(I_WB(:,:,tt)),[0,256]); colormap('gray');title('WB');
-    figure(h4); imagesc(squeeze(I_PPID(:,:,tt)),[0,256]); colormap('gray');title('PPID');
-    figure(h5); imagesc(squeeze(I_ItSD(:,:,tt)),[0,256]); colormap('gray');title('ItSD');
-    
-    pause(1);
-    
-end
 
 
 

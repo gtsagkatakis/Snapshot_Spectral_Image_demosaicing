@@ -1,4 +1,4 @@
-function [mean_PSNR,mean_SAM]=evaluate_on_SENTINEL(num_band,sz,smp_scenario,num_obs_pxl,GRMR_params)
+function [mean_PSNR,mean_SAM,RES_IMAGE]=evaluate_on_SENTINEL(num_band,sz,smp_scenario,num_obs_pxl,GRMR_params)
 
 load('Sentinel_data.mat');
 
@@ -10,7 +10,7 @@ I_HS=round(I_HS);
 
 [n1,n2,n3]=size(I_HS);
 
-[SMP_seq,FilterPattern_lst]=make_sampling_operators(n1,n2,n3,num_obs_pxl,num_band,smp_scenario,SpectralProfiles);
+[SMP_seq,FilterPattern_lst]=make_sampling_operators2(n1,n2,n3,num_obs_pxl,num_band,smp_scenario,SpectralProfiles);
 [I_MOS_seq]=acquire_observations(I_HS,SMP_seq,num_obs_pxl);
 
 SMP_SEQ=SMP_seq;
@@ -41,16 +41,10 @@ I_BTES=mean(I_BTES_tmp,4);
 I_ItSD=mean(I_ItSD_tmp,4);
 I_PPID=mean(I_PPID_tmp,4);
 
-% offset=10;
-% maxIter=20;
-% sgm2=1e2; %weight for distnace estimation
-% gamma=0.1; %0.1
-% rank_sel=2;
-
 offset=GRMR_params.offset;
-maxIter=GRMR_params.maxIter; 
-sgm2=GRMR_params.sgm2; 
-gamma=GRMR_params.gamma; 
+maxIter=GRMR_params.maxIter;
+sgm2=GRMR_params.sgm2;
+gamma=GRMR_params.gamma;
 rank_sel=GRMR_params.rank_sel;
 
 disp('Running GRMR');
@@ -91,24 +85,51 @@ err_SAM_WB=mean(mean(err_SAM_WB_temp));
 err_SAM_ItSD=mean(mean(err_SAM_ItSD_temp));
 err_SAM_BTES=mean(mean(err_SAM_BTES_temp));
 
-mean_PSNR=[mean(mean(err_GRMR)),mean(mean(err_PPID)),mean(mean(err_WB)),mean(mean(err_ItSD)),mean(mean(err_BTES))];
+mean_PSNR=[mean(mean( err_GRMR )),mean(mean( err_PPID )),mean(mean( err_WB )),mean(mean( err_ItSD )),mean(mean( err_BTES ))];
 mean_SAM=[mean((err_SAM_GRMR)),mean((err_SAM_BTES)),mean((err_SAM_WB)),mean((err_SAM_PPID)),mean((err_SAM_ItSD))];
 
-h1=figure;
-h2=figure;
-h3=figure;
-h4=figure;
-h5=figure;
+% 
+% h1=figure;
+% h2=figure;
+% h3=figure;
+% h4=figure;
+% h5=figure;
+% 
+% for tt=1:num_band
+%     figure(h1); imagesc(squeeze(I_GRMR_rec(:,:,tt)),[0,256]); colormap('gray'); title('GRMR');
+%     figure(h2); imagesc(squeeze(I_BTES(:,:,tt)),[0,256]); colormap('gray');title('BTES');
+%     figure(h3); imagesc(squeeze(I_WB(:,:,tt)),[0,256]); colormap('gray');title('WB');
+%     figure(h4); imagesc(squeeze(I_PPID(:,:,tt)),[0,256]); colormap('gray');title('PPID');
+%     figure(h5); imagesc(squeeze(I_ItSD(:,:,tt)),[0,256]); colormap('gray');title('ItSD');
+%     
+%     pause(1);
+%     
+% end
 
-for tt=1:num_band
-    figure(h1); imagesc(squeeze(I_GRMR_rec(:,:,tt)),[0,256]); colormap('gray'); title('GRMR');
-    figure(h2); imagesc(squeeze(I_BTES(:,:,tt)),[0,256]); colormap('gray');title('BTES');
-    figure(h3); imagesc(squeeze(I_WB(:,:,tt)),[0,256]); colormap('gray');title('WB');
-    figure(h4); imagesc(squeeze(I_PPID(:,:,tt)),[0,256]); colormap('gray');title('PPID');
-    figure(h5); imagesc(squeeze(I_ItSD(:,:,tt)),[0,256]); colormap('gray');title('ItSD');
-    
+RES_IMAGE{1}=I_HS;
+RES_IMAGE{2}=I_GRMR_rec;
+RES_IMAGE{3}=I_BTES;
+RES_IMAGE{4}=I_WB;
+RES_IMAGE{5}=I_PPID;
+RES_IMAGE{6}=I_ItSD;
+
+for tt=1:9
+    subplot(2,3,1); imagesc(squeeze(I_HS(:,:,tt)),[0,255]); title('TRUE'); colormap('gray');
+    subplot(2,3,2); imagesc(squeeze(I_GRMR_rec(:,:,tt)),[0,255]); title('GRMR'); colormap('gray');
+    subplot(2,3,3); imagesc(squeeze(I_BTES(:,:,tt)),[0,255]); title('BTES'); colormap('gray');
+    subplot(2,3,4); imagesc(squeeze(I_WB(:,:,tt)),[0,255]); title('WB'); colormap('gray');
+    subplot(2,3,5); imagesc(squeeze(I_PPID(:,:,tt)),[0,255]); title('PPID'); colormap('gray');
+    subplot(2,3,6); imagesc(squeeze(I_ItSD(:,:,tt)),[0,255]); title('ItSD'); colormap('gray');
+
+%     figure; imagesc(squeeze(I_HS(:,:,tt)),[0,255]); title('TRUE'); colormap('gray');
+%     figure; imagesc(squeeze(I_GRMR_rec(:,:,tt)),[0,255]); title('GRMR'); colormap('gray');
+%     figure; imagesc(squeeze(I_BTES(:,:,tt)),[0,255]); title('BTES'); colormap('gray');
+%     figure; imagesc(squeeze(I_WB(:,:,tt)),[0,255]); title('WB'); colormap('gray');
+%     figure; imagesc(squeeze(I_PPID(:,:,tt)),[0,255]); title('PPID'); colormap('gray');
+%     figure; imagesc(squeeze(I_ItSD(:,:,tt)),[0,255]); title('ItSD'); colormap('gray');
+
     pause(1);
-    
+
 end
 
 

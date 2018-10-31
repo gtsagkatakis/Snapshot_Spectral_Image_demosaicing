@@ -2,12 +2,14 @@ function [I1_MOS,I1_SMP_SEQ,band_sorted]=load_snapshot_w_band_new(sz,num_band)
 
 if num_band==25
     load spectral_responses_5x5
-    I1_MOS=double(imread('img_target2_exp400_FD21_FN1.pgm'));
+%     I1_MOS=double(imread('example1_5x5.pgm'));
+    I1_MOS=double(imread('example2_5x5.pgm'));
     CentralWavelengths=round(CentralWavelengths);
 elseif num_band==16
     load spectral_responses_4x4
     Wavelength = round(CentralWavelength);
-    I1_MOS=double(imread('img_FD4_FN1.pgm'));
+    I1_MOS=double(imread('example1_4x4.pgm'));
+%     I1_MOS=double(imread('example2_4x4.pgm'));
     CentralWavelengths=round(CentralWavelength);
 end
 

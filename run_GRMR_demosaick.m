@@ -1,6 +1,8 @@
 function I_GMRM_rec=run_GRMR_demosaick(I_MOS_seq,SMP_seq,num_band,offset,sgm2,maxIter,rank_sel,gamma,I_WB)
 
-step_size=offset/2;
+% step_size=floor(offset);
+step_size=floor(offset/2);
+
 
 [n1,n2,num_obs_pxl]=size(I_MOS_seq);
 if num_obs_pxl==1
@@ -46,3 +48,8 @@ for tt=1:numel(FilterPattern_lst)
     CNT(Loc{tt}(1):Loc{tt}(1)+offset-1,Loc{tt}(2):Loc{tt}(2)+offset-1,:)=CNT(Loc{tt}(1):Loc{tt}(1)+offset-1,Loc{tt}(2):Loc{tt}(2)+offset-1,:)+ones(offset,offset,num_band);
 end
 I_GMRM_rec=I_rec0./CNT;
+
+I_GMRM_rec(1:step_size,:,:)=I_WB(1:step_size,:,:);
+I_GMRM_rec(:,1:step_size,:)=I_WB(:,1:step_size,:);
+I_GMRM_rec(end-step_size-1:end,:,:)=I_WB(end-step_size-1:end,:,:);
+I_GMRM_rec(:,end-step_size-1:end,:)=I_WB(:,end-step_size-1:end,:);
